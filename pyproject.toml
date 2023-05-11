@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "momo"
+version = "0.1.0"
+description = ""
+authors = ["sliverKi <lovee2756@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2"
+djangorestframework = "^3.14.0"
+djangorestframework-simplejwt = "^5.2.2"
+dj-rest-auth = "^3.0.0"
+django-cors-headers = "^3.14.0"
+pillow = "^9.5.0"
+django-multiupload = "^0.6.1"
+django-allauth = "^0.54.0"
+django-rest-auth = "^0.9.5"
+django-environ = "^0.10.0"
+drf-yasg = "^1.21.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

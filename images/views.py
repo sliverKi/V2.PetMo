@@ -1,9 +1,8 @@
+import requests
 from django.shortcuts import render
-
 from config.settings import CF_ID, CF_TOKEN
 from rest_framework.views import APIView
 from rest_framework.response import Response
-import requests
 
 class GetUploadURL(APIView):
     def post(self, request):

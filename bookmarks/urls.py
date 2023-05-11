@@ -7,4 +7,3 @@ urlpatterns=[
     
 ]
 
-#+) bookmakrCount 추가하기

@@ -77,31 +77,31 @@ class MyPost(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 class MyComment(APIView):
     @swagger_auto_schema(
-    operation_summary="현재 로그인한 사용자의 작성 댓글 정보",
-    response={
-        200: openapi.Response(
-            description="Success Response",
-            schema=openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    "user_comments": openapi.Schema(
-                        type=openapi.TYPE_ARRAY,
-                        items=openapi.Schema(
-                            type=openapi.TYPE_OBJECT,
-                            properties={
-                                "id": openapi.Schema(type=openapi.TYPE_INTEGER),
-                                "content": openapi.Schema(type=openapi.TYPE_STRING),
-                                "created_at": openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATETIME),
-                                "updated_at": openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATETIME),
-                                "post": PostSerializers(),
-                            },
+        operation_summary="현재 로그인한 사용자의 작성 댓글 정보",
+        response={
+            200: openapi.Response(
+                description="Success Response",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "user_comments": openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                properties={
+                                    "id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                                    "content": openapi.Schema(type=openapi.TYPE_STRING),
+                                    "created_at": openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATETIME),
+                                    "updated_at": openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATETIME),
+                                    "post": PostSerializers(),
+                                },
+                            ),
                         ),
-                    ),
-                },
+                    },
+                ),
             ),
-        ),
-    },
-)
+        },
+    )
     def get(self, request):
         user=request.user
         user_comments=Comment.objects.filter(user=user).select_related('post')#user가 작성한 댓글 
@@ -306,7 +306,6 @@ class getAddress(APIView):
             403: "Permission Denied",
             404: "Not Found",
         },
-        tags=["Address"],
         operation_id="delete_my_address",
     )    
     def delete(self, request):
@@ -324,7 +323,7 @@ class getAddress(APIView):
         user.user_address.delete()
         user.user_address=None
         user.save()
-        return Response(status=status.HTTP_200_OK)
+        return Response({"Success address delete."},status=status.HTTP_200_OK)
        
 
 class getIP(APIView):#ip기반 현위치 탐색
@@ -529,7 +528,7 @@ class getPets(APIView): #유저의 동물 등록
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class Quit(APIView):
-    @swagger_auto_schema(
+    @swagger_auto_schema(  
         operation_summary="회원 탈퇴를 위한 사용자 정보 조회",
         response={
             200: UserSerializers,
@@ -548,8 +547,9 @@ class Quit(APIView):
     #input data {"password":"xxx"}
     @swagger_auto_schema(
         operation_summary="회원 탈퇴 요청",
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
+        request_body=openapi.Schema(#field를 새로 만듦
+            description='회원 탈퇴를 요청하는 사용자의 현재 비밀번호를 확인하여 사용자 확인',
+            type=openapi.TYPE_OBJECT,#객체 타입
             properties={
                 'password': openapi.Schema(
                 type=openapi.TYPE_STRING, 
@@ -559,7 +559,7 @@ class Quit(APIView):
             required=['password'],
         ),
         responses={
-            204: '탈퇴 성공',
+            204: 'Success Quit',
             400: '잘못된 요청',
             401: '권한 없음',
             404: '유저를 찾을 수 없음',

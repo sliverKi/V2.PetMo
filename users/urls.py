@@ -8,7 +8,7 @@ urlpatterns=[
     path("MY/Comment", views.MyComment.as_view()),#user작성한 댓글 조회[GET]
     path("my-info", views.MyInfo.as_view()), #user profile 수정 [GET, PUT](ok) 
     
-    path("address", views.getAddress.as_view()),#[POST, PUT, DELETE] 사용자가 등록한 동네 조회, 삭제, POST] +)+)동네 재설정 추가, 동네 삭제[PUT]
+    path("address/", views.getAddress.as_view()),#[POST, PUT, DELETE] 사용자가 등록한 동네 조회, 삭제, POST] +)+)동네 재설정 추가, 동네 삭제[PUT]
     path("address/get/ip", views.getIP.as_view()), #user 현 위치의 동네 조회[GET]
     path("address/get/query", views.getQuery.as_view()), #검색어 기반 동네 조회 [GET]
 

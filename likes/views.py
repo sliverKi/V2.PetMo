@@ -1,12 +1,25 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
+
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, serializers
 from .models import PostLike
 from posts.models import Post
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
-
-class PostLikes(APIView):    
+class PostLikes(APIView):  
+    @swagger_auto_schema(
+        request_body=serializers.Serializer({
+            "post": serializers.IntegerField(),
+        }),
+        responses={
+            200: "created or deleted",
+            404: "Not found.",
+        },
+        operation_summary="Like or Unlike a Post",
+        operation_description="Like or unlike a post by providing its ID in the request body. If the like object is created, the response status is 'created', and if it's deleted, the response status is 'deleted'.",
+    )  
     def post(self, request, pk):
         #input data: {"post":1}
         post = get_object_or_404(Post, pk=pk)#pk에 해당하는 Post 객체를 가져옴. 

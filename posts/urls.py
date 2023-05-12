@@ -9,7 +9,7 @@ urlpatterns=[
     path("<int:pk>/comments/<int:comment_pk>", views.PostCommentsDetail.as_view()), #[GET, PUT(댓글 대댓글 수정, DELETE]
         
     path("comments/", views.Comments.as_view()), #[GET, POST, pagination]
-    path("comments/<int:pk>", views.CommentDetail.as_view()),#[GET,PUT,DELETE]
+    path("comments/<int:pk>", views.CommentDetail.as_view()),#[GET,PUT(댓글만 수정 가능),DELETE]
 ]
 # pagination 적용 OK
 # 게시글 : 10개 pagination, 댓글: 5개 pagination

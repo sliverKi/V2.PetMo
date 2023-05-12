@@ -54,7 +54,8 @@ class Post(CommonModel):
 class Comment(CommonModel):
     user=models.ForeignKey(
         "users.User",
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        help_text="댓글 작성자의 pk"
     )    
     post=models.ForeignKey(
         "posts.Post",
@@ -62,11 +63,13 @@ class Comment(CommonModel):
         blank=True,
         null=True,
         related_name="post_comments",
+        help_text="댓글이 달린 게시글의 pk"
     )
     content=models.CharField(#댓글 작성
         max_length=150,
         blank=True,
         null=True,
+        help_text="댓글 내용"
     )
     parent_comment=models.ForeignKey(#parent_comment에 값이 있으면 대댓글, 값이 없으면 댓글 
         "self",
@@ -74,6 +77,7 @@ class Comment(CommonModel):
         blank=True,
         null=True,
         related_name="replies",
+        help_text="댓글 인지 대댓글인지 구분 토글, if parent_comment==Null: 댓글, else: 대댓글"
     )
    
     def __str__(self):

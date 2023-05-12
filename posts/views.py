@@ -15,6 +15,8 @@ from .serializers import (
     CommentSerializers, ReplySerializers
     )
 from .pagination import PaginaitionHandlerMixin
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class CommentPagination(CursorPagination):
     page_size=5
@@ -22,7 +24,18 @@ class CommentPagination(CursorPagination):
 
 class Comments(APIView, PaginaitionHandlerMixin):
     pagination_class=CommentPagination
-
+    @swagger_auto_schema(
+        operation_summary='댓글, 대댓글 조회',
+        operation_description='Retrieve paginated list of top-level comments',
+        responses={
+            200: 'Success',
+            400: 'Bad request',
+            401: 'Authentication failed',
+            403: 'Access denied',
+            404: 'Not found',
+            500: 'Internal server error'
+        },
+    )
     def get(self,request):
         all_comments=Comment.objects.filter(parent_comment=None)
         page=self.paginate_queryset(all_comments)
@@ -34,6 +47,43 @@ class Comments(APIView, PaginaitionHandlerMixin):
         # serializer=ReplySerializers(all_comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+    @swagger_auto_schema(
+        operation_summary='댓글, 대댓글 생성',
+        request_body=openapi.Schema(
+
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'content': openapi.Schema(
+                    description='내용',
+                    type=openapi.TYPE_STRING),
+                'post': openapi.Schema(
+                    description='댓글 or 대댓글이 작성되어진 게시글 번호',
+                    type=openapi.TYPE_INTEGER),
+                'parent_comment': openapi.Schema(
+                    description='댓글 대댓글 구분 토글, if parent_comment==Null: 댓글, else: 대댓글 ',
+                    type=openapi.TYPE_INTEGER),
+            },
+            required=['content', 'post'],
+        ),
+        responses={
+            201: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'content': openapi.Schema(type=openapi.TYPE_STRING),
+                    'user': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'post': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'parent_comment': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'createdDate': openapi.Schema(type=openapi.TYPE_STRING),
+                    'updatedDate': openapi.Schema(type=openapi.TYPE_STRING),
+                },
+                required=['id', 'content', 'user', 'post', 'createdDate', 'updatedDate'],
+            ),
+            400: 'Invalid request data',
+            404: 'The post or comment does not exist',
+            500: 'Internal server error',
+        }
+    )
     def post(self, request):
         #예외 : 존재 하지 않는 게시글에 댓글 작성 불가
         #예외 : 존재 하지 않는 게시글에 대댓글 작성 불가
@@ -80,7 +130,37 @@ class CommentDetail(APIView):# 댓글:  조회 생성, 수정, 삭제(ok)
         except Comment.DoesNotExist:
             raise NotFound
     
-    def get(self, request, pk):
+    @swagger_auto_schema(
+        operation_summary="특정 댓글 조회",
+        responses={
+            200: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'id': openapi.Schema(
+                        description="댓글 or 대댓글의 id",
+                        type=openapi.TYPE_INTEGER),
+                    'content': openapi.Schema(
+                        description="댓글 or 대댓글의 내용",
+                        type=openapi.TYPE_STRING),
+                    'user': openapi.Schema(
+                        description="댓글 or 대댓글의 작성자의 pk",
+                        type=openapi.TYPE_OBJECT),
+                    'post': openapi.Schema(
+                        description="댓글 or 대댓글이 존재하는 게시글의 pk",
+                        type=openapi.TYPE_INTEGER),
+                    'parent_comment': openapi.Schema(
+                        description="댓글 or 대댓글 인지 구분(null이면 댓글, 값이면 해당 값을 가진 댓글의 대댓글)",
+                        type=openapi.TYPE_INTEGER),
+                    'createdDate': openapi.Schema(type=openapi.TYPE_STRING),
+                    'updatedDate': openapi.Schema(type=openapi.TYPE_STRING),
+                },
+                required=['id', 'content', 'user', 'post', 'createdDate', 'updatedDate'],
+            ),
+            404: 'The comment does not exist',
+            500: 'Internal server error',
+        }
+    )
+    def get(self, request, pk):#댓글의 pk로 접속시 해당 댓글이 갖고 있는 대댓글도 같이 조회함
         comment=self.get_object(pk=pk)
         serializer=ReplySerializers(
             comment,
@@ -88,9 +168,42 @@ class CommentDetail(APIView):# 댓글:  조회 생성, 수정, 삭제(ok)
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+    @swagger_auto_schema(
+        operation_summary="특정 댓글 수정",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'content': openapi.Schema(type=openapi.TYPE_STRING),
+            },
+            required=['content'],
+        ),
+        responses={
+            202: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'content': openapi.Schema(type=openapi.TYPE_STRING),
+                    'user': openapi.Schema(type=openapi.TYPE_OBJECT),
+                    'post': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'parent_comment': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'createdDate': openapi.Schema(type=openapi.TYPE_STRING),
+                    'updatedDate': openapi.Schema(type=openapi.TYPE_STRING),
+                },
+                required=['id', 'content', 'user', 'post', 'createdDate', 'updatedDate'],
+            ),
+            400: 'Invalid input',
+            404: 'The comment does not exist',
+            500: 'Internal server error',
+        }
+    )
     def put(self, request,pk): 
-        # 댓글과 대댓글의 수정은 독립적으로 이루어져야 함.
+        #예외 댓글 수정시에 해당 댓글이 있는지 우선 확인해야]
+        
         comment=self.get_object(pk=pk)
+        
+        if comment.parent_comment:
+            if comment.parent_comment.post.id!=comment.post.id:
+                return Response({"error":"해당 댓글이 게시글에 존재하지 않습니다."}, status=status.HTTP_400_BAD_REQUEST)
         serializer=CommentSerializers(#before : commentDetailSerializers
             comment, 
             data=request.data,
@@ -102,6 +215,14 @@ class CommentDetail(APIView):# 댓글:  조회 생성, 수정, 삭제(ok)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        operation_summary="특정 댓글삭제. 해당 댓글 삭제시 종속되어진 대댓글도 모두 삭제",
+        responses={
+            200: 'OK',
+            403: 'Permission denied',
+            404: 'Not found'
+        }
+    )
     def delete(self, request,pk):
         #댓글 삭제시 대댓글도 삭제 
         comment=self.get_object(pk)
@@ -120,7 +241,13 @@ class Posts(APIView, PaginaitionHandlerMixin):#image test 해보기 - with front
     # authentication_classes=[SessionAuthentication]
     # permission_classes=[IsAuthenticated]
     pagination_class=PostPagination
-    
+    @swagger_auto_schema(
+        operation_summary="모든 게시글 목록 조회",
+        responses={
+            200: PostListSerializers(many=True)
+        },
+        
+    )
     def get(self, request, format=None):
         all_posts=Post.objects.all()
         page=self.paginate_queryset(all_posts)
@@ -131,6 +258,14 @@ class Posts(APIView, PaginaitionHandlerMixin):#image test 해보기 - with front
             serializer=PostListSerializers(all_posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+    @swagger_auto_schema(
+        operation_summary="단일 게시글 생성",
+        request_body=PostSerializers,
+        responses={
+            status.HTTP_201_CREATED: PostListSerializers,
+            status.HTTP_400_BAD_REQUEST: "Bad Request"
+        }
+    )
     def post(self, request):#게시글 생성
     #input data:{"content":"test post", "boardAnimalTypes":["강아지"], "Image":[], "categoryType":"장소후기"}   
         serializer=PostSerializers(data=request.data)
@@ -208,7 +343,7 @@ class PostComments(APIView, PaginaitionHandlerMixin ):#게시글에 등록 되�
             raise NotFound
 
     def get(self, request, pk):
-        comments=Comment.objects.filter(parent_comment=None)
+        comments=Comment.objects.filter(post=pk, parent_comment=None)
         page=self.paginate_queryset(comments)
         if page is not None:
             serializer=ReplySerializers(page, many=True)

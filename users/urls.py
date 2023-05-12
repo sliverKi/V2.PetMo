@@ -13,7 +13,7 @@ urlpatterns=[
     path("address/get/query", views.getQuery.as_view()), #검색어 기반 동네 조회 [GET]
 
     path("animals", views.getPets.as_view()),#[GET, POST]
-    path("withdrawal", views.Quit.as_view())#[DELETE]
+    path("withdrawal", views.Quit.as_view()),#[DELETE]
 ]
 
 #처리된 url 손봐야 함.

@@ -40,7 +40,7 @@ class LogIn(APIView):
             return Response({"error":"이미 탈퇴한 회원입니다."}, status=status.HTTP_404_NOT_FOUND)
         
         if user.check_password(password):
-            user.is_first==False
+            
             login(request, user)
             serializer=UserSerializers(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -130,8 +130,6 @@ class KakaoCallBack(APIView):
             
         except KeyError:
             return Response({"message": "INVALID_TOKEN"}, status=status.HTTP_400_BAD_REQUEST)
-        
-       
         
         if User.objects.filter(email=email).exists():
             kakao_user = User.objects.get(email=email)

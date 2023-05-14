@@ -184,7 +184,35 @@ class PostListSerializers(ModelSerializer):#간략한 정보만을 보여줌
     def get_commentCount(self, obj):
         return obj.commentCount
     
-     
+class PostListSerializer(ModelSerializer):#MY/Post에서 이용
+    # user=TinyUserSerializers(read_only=True)
+    boardAnimalTypes=PetsSerializers(many=True)
+    categoryType=BoardSerializers()
+    Image=ImageSerializers(many=True, read_only=True, required=False)
+    commentCount=serializers.SerializerMethodField()
+    class Meta:
+        model=Post
+        fields=(
+            "pk",
+            "categoryType",
+            "boardAnimalTypes",
+            "user",
+            "content",
+            "Image",
+            "createdDate", 
+            "updatedDate",
+            "viewCount",#조회수
+            "likeCount",#좋아요 수 
+            "commentCount",#댓글 수 (대댓글 미포함)
+            "bookmarkCount",#북마크 수
+        )
+    def get_images(self, post):
+        images = post.images.all()
+        if images.exists():
+            return ImageSerializers(images.first(), context=self.context).data   
+        return [] 
+    def get_commentCount(self, obj):
+        return obj.commentCount     
 class PostDetailSerializers(ModelSerializer):#image 나열
     user=TinyUserSerializers()
     boardAnimalTypes=PetsSerializers(many=True)

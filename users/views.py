@@ -16,18 +16,19 @@ from rest_framework.permissions import IsAuthenticated
 from .models import User, Address
 from . import serializers
 from .serializers import (
-    TinyUserSerializers, PrivateUserSerializers, 
+    
+    SimpleUserSerializer, PrivateUserSerializers, 
     AddressSerializer, AddressSerializers, UserSerializers,
     EnrollPetSerailzer
     )
 from pets.models import Pet
 from posts.models import Post, Comment
-from posts.serializers import PostListSerializers,PostSerializers, CommentSerializers, ReplySerializers
+from posts.serializers import PostListSerializer,PostListSerializers,PostSerializers, CommentSerializers, ReplySerializers
 
 #start images: docker run -p 8000:8000 petmo-back
 class StaticInfo(APIView):
 
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
 
     @swagger_auto_schema(
         operation_summary="요청 유저의 정적 정보 조회",
@@ -54,10 +55,10 @@ class MyPost(APIView):
                 schema=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
                     properties={
-                        "user":TinyUserSerializers(),
+                        "user":SimpleUserSerializer,
                         "user_posts":openapi.Schema(
                             type=openapi.TYPE_ARRAY,
-                            items=PostListSerializers(),
+                            items=PostListSerializer,
                         ),
                     },
                 ),
@@ -68,10 +69,10 @@ class MyPost(APIView):
         user = request.user
 
         user_posts=Post.objects.filter(user=user)#user가 작성한 게시글
-        user_post_serialized = PostListSerializers(user_posts, many=True).data
+        user_post_serialized = PostListSerializer(user_posts, many=True).data
         
         response_data = {
-            "user": TinyUserSerializers(user).data,
+            "user": SimpleUserSerializer(user).data,
             "user_posts": user_post_serialized,
         }
         return Response(response_data, status=status.HTTP_200_OK)
@@ -188,7 +189,7 @@ class getAddress(APIView):
                 schema=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
                     properties={
-                        "error": openapi.Schema(
+                        "message": openapi.Schema(
                             type=openapi.TYPE_STRING,
                             description="Error message",
                         ),
@@ -206,7 +207,7 @@ class getAddress(APIView):
             serializer = AddressSerializer(user_address)
             return Response(serializer.data, status=status.HTTP_200_OK) 
         else:
-            return Response({"error":"사용자가 아직 내동네 설정을 하지 않았습니다. "}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message":"사용자가 아직 내동네 설정을 하지 않았습니다."}, status=status.HTTP_404_NOT_FOUND)
     
     @swagger_auto_schema(
         operation_summary="현재 로그인한 사용자의 주소 설정",
@@ -259,7 +260,7 @@ class getAddress(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return Response({"error": "Failed to Save Address Data"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": "Failed to Save Address Data."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @swagger_auto_schema(
         operation_summary="현재 로그인한 사용자의 주소 재설정",
@@ -285,14 +286,14 @@ class getAddress(APIView):
         if not user.user_address:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
-        serializer=AddressSerializer(
+        serializer=AddressSerializers(
             user.user_address,
             data=request.data,
             partial=True,
         )
         if serializer.is_valid():
             updated_address=serializer.save()
-            serializer=AddressSerializer(updated_address)
+            serializer=AddressSerializers(updated_address)
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -354,7 +355,7 @@ class getIP(APIView):#ip기반 현위치 탐색
             print("client IP address: ", client_ip_address)
 
             if not client_ip_address:
-                return Response({"error": "could not get Client IP address"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Could not get Client IP address."}, status=status.HTTP_400_BAD_REQUEST)
             geolocation_url =  f'https://www.googleapis.com/geolocation/v1/geolocate?key={GOOGLE_MAPS_API_KEY}'
             data = {
                 'considerIp':'true',#IP참조 
@@ -386,9 +387,9 @@ class getIP(APIView):#ip기반 현위치 탐색
                         })
                     return Response(address, status=status.HTTP_200_OK)
                 else:
-                    return Response({"error":"Failed to get region data for IP address"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"error":"Failed to get region data for IP address."}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response({"error": "Failed to get geolocation data for IP address"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Failed to get geolocation data for IP address."}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": "Failed to Load open API data."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
    
@@ -459,10 +460,10 @@ class getQuery(APIView):#검색어 입력 기반 동네 검색
            
         search_query=request.GET.get('q')
         # print(search_query)
-        if len(search_query)<2:
-            raise ParseError("2자 미만.error")
-        if not search_query:
-            raise ParseError("검색할 키워드를 입력해 주세요.")
+        if not search_query and len(search_query)<2:
+            raise ValidationError("error: 검색 키워드를 2자 이상으로 입력해 주세요.")
+        # if :
+        #     raise ValidationError("error: 검색할 키워드를 입력해 주세요.")
         
         search_url='https://dapi.kakao.com/v2/local/search/address.json'
         headers={'Authorization': f'KakaoAK {KAKAO_API_KEY}'}
@@ -472,7 +473,7 @@ class getQuery(APIView):#검색어 입력 기반 동네 검색
         print("res", response)
         datas=response.json()
         if not datas['documents']:
-            raise ParseError("입력하신 주소가 없습니다. ")
+            raise ValidationError("error: 입력하신 주소가 존재하지 않습니다.")
         
         return Response(datas, status=status.HTTP_200_OK)
 

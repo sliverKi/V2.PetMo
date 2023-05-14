@@ -1,3 +1,4 @@
+import re
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
@@ -5,7 +6,7 @@ from rest_framework.exceptions import ParseError,ValidationError
 from .models import User, Address
 from pets.serializers import PetsSerializers
 from pets.models import Pet
-class TinyUserSerializers(ModelSerializer):
+class TinyUserSerializers(ModelSerializer):#내동네 설정에서 이용
     #user 정보 : username, profile, pets, region,/ 작성 글(게시글, [댓글, 대댓글]이 있는 게시글)
     pets= PetsSerializers(many=True)
     regionDepth2=serializers.CharField(source="user_address.regionDepth2", read_only=True)
@@ -17,6 +18,19 @@ class TinyUserSerializers(ModelSerializer):
             "username",
             "profile",
             "pets",
+            "regionDepth2",
+            "regionDepth3",
+        )
+class SimpleUserSerializer(ModelSerializer):#MY/Post에서 이용
+    #user 정보 : username, profile, pets, region,/ 작성 글(게시글, [댓글, 대댓글]이 있는 게시글)
+    regionDepth2=serializers.CharField(source="user_address.regionDepth2", read_only=True)
+    regionDepth3=serializers.CharField(source="user_address.regionDepth3", read_only=True)
+
+    class Meta:
+        model=User
+        fields=(
+            "username",
+            "profile",
             "regionDepth2",
             "regionDepth3",
         )
@@ -35,17 +49,19 @@ class AddressSerializers(serializers.ModelSerializer):#내동네 설정시 이�
         extra_kwargs = {"regionDepth3":{"required":False}}
         #필수 필드가 아닌 선택적 필드로 변경 ex)경기도 시흥시 (xx구)
     
+    
     def validate(self, attrs):
+        
         addressName=attrs.get("addressName")
         regionDepth1=attrs.get("regionDepth1")
         regionDepth2=attrs.get("regionDepth2")
 
         if not addressName:
-            raise ValidationError("전체 주소를 입력해 주세요.")    
+           raise ValidationError("전체 주소를 입력해 주세요.")    
         elif not regionDepth1:
             raise ValidationError("시도 단위 주소를 입력해 주세요.")
         elif not regionDepth2:
-                raise ValidationError("구 단위 주소를 입력해 주세요.")
+                raise ValidationError("군,구 단위 주소를 입력해 주세요.")
         else: 
             return attrs     
 
@@ -100,7 +116,7 @@ class PrivateUserSerializers(ModelSerializer):
         #input data
         """ {"username":"eungi",
             "profile":"https://www.lifewithcats.tv/wp-content/uploads/2011/04/Jumping-Cat.jpg",
-            "pets":[{"species":"cat"}, {"species":"fish"}]}
+            "pets":[{"animalTypes":"고양이"}, {"animalTypes":"물고기"}]}
         """
         pets_data = validated_data.pop("pets", None)
         if pets_data is not None:
@@ -114,17 +130,17 @@ class PrivateUserSerializers(ModelSerializer):
                 )
             instance.pets.clear()
             for pet in pets_data:
-                species = pet.get("species")
-                if not species:
+                animalTypes = pet.get("animalTypes")
+                if not animalTypes:
                     raise serializers.ValidationError(
                         "Pet species should be provided."
                     )
                 try:
-                    pet_obj = Pet.objects.get(species=species)
+                    pet_obj = Pet.objects.get(animalTypes=animalTypes)
                     instance.pets.add(pet_obj)
                 except Pet.DoesNotExist:
                     raise serializers.ValidationError(
-                        f"{species} is not a valid pet species."
+                        f"{animalTypes} is not a valid pet species."
                     )
         return super().update(instance, validated_data)
     

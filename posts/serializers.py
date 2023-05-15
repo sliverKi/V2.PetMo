@@ -25,7 +25,7 @@ sys.setrecursionlimit(100000)
 
 
 class CommentSerializers(ModelSerializer):
-    # user=SimpleUserSerializer(read_only=True)
+    user=SimpleUserSerializer(read_only=True)
     class Meta:
         model=Comment
         fields=( 
@@ -37,9 +37,6 @@ class CommentSerializers(ModelSerializer):
             "createdDate",
             "updatedDate"
         ) 
-    # def validate(self, attrs):
-        #예외: content field가 None 이면, 에러 발생
-        # return super().validate(attrs)
 class ReplySerializers(ModelSerializer):
     children=serializers.SerializerMethodField()
     user=SimpleUserSerializer(read_only=True)

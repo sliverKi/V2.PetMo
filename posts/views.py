@@ -362,9 +362,7 @@ class PostComments(APIView, PaginaitionHandlerMixin ):#게시글에 등록 되�
         #input data:
         # {
         # "parent_comment": null,
-        # "post": 4,
-        # "user": 4,
-        # "content": "댓글1"(-> required filed로 변경해야)
+        # "content": "댓글1"
         # }
         content=request.data.get("content")
         post=self.get_object(pk=pk)
@@ -383,23 +381,25 @@ class PostComments(APIView, PaginaitionHandlerMixin ):#게시글에 등록 되�
                 return Response({"error":"해당 댓글이 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
         
             comment=Comment.objects.create(
-            content=content,
-            user=request.user,
-            post=parent_comment.post,
-            parent_comment=parent_comment
+                content=content,
+                user=request.user,
+                post=parent_comment.post,
+                parent_comment=parent_comment
             )
             serializer = ReplySerializers(comment)
             return Response(serializer.data, status=status.HTTP_201_CREATED)           
+        
         else: #댓글
             print("댓글")
-            serializer=CommentSerializers(
-                data=request.data
+            comment = Comment.objects.create(
+                content=content,
+                user=request.user,
+                post=post,
+                parent_comment=None
             )
-            if serializer.is_valid():
-                comment=serializer.save(post=post)
-                serializer=CommentSerializers(comment)
+            serializer = CommentSerializers(comment)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-            
+           
 class PostCommentsDetail(APIView):
 
     def get_post(self, pk):

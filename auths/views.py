@@ -36,11 +36,7 @@ class LogIn(APIView):
         if not email or not password:
            return Response({"error":"이메일과 비밀번호를 입력해주세요."}, status=status.HTTP_400_BAD_REQUEST)
         
-        if not user.is_active:
-            return Response({"error":"이미 탈퇴한 회원입니다."}, status=status.HTTP_404_NOT_FOUND)
-        
         if user.check_password(password):
-            
             login(request, user)
             serializer=UserSerializers(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -54,17 +50,18 @@ class LogOut(APIView):
         return Response({"success":"Success logout! :) See you!"}, status=status.HTTP_200_OK)
     
       
-
-
 class Register(APIView):
     
     def get(self, request):
-        return Response({"회원가입"}, status=status.HTTP_200_OK)
+        return Response({"회원가입: email, password, username을 입력해 주세요."}, status=status.HTTP_200_OK)
     
     #input data {"email":"moomoo@gmail.com", "username":"eungimoo", "password":"eungi"}
     def post(self, request, format=None):#privateUserSerializers
         password=request.data.get("password")
-        if not password:
+        username=request.data.get("username")
+        email=request.data.get("email")
+
+        if not password or not username or not email :
             raise ParseError
         serializer=RegisterSerializers(data=request.data)
         if serializer.is_valid():

@@ -4,24 +4,24 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from .manager import UserManager
-
+from django.core.validators import MinLengthValidator
 class User(AbstractUser):
 
-    username_validator = UnicodeUsernameValidator()
+    # username_validator = UnicodeUsernameValidator()
 
     username = models.CharField(#닉네임
         _("username"),
         max_length=255,
         blank=True,
         unique=True,
-        validators=[username_validator],
-        error_messages={"unique":"이미 존재하는 닉네임 입니다."}
+        validators=[MinLengthValidator(2, "닉네임은 2자 이상이어야 합니다.")],
+        error_messages={"unique":"이미 사용중인 닉네임 입니다."}
     )
     email = models.EmailField(
         _("email_address"),
         max_length=255,
         unique=True,
-        error_messages={"unique":"이미 존재하는 이메일 입니다."},
+        error_messages={"unique":"이미 사용중인 이메일 입니다."},
     )
     profile=models.URLField(
         blank=True,
@@ -56,7 +56,7 @@ class User(AbstractUser):
         _("dated_joined"),
         default=timezone.now,
     )
-
+    
     objects = UserManager()
 
     USERNAME_FIELD = "email"

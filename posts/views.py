@@ -4,13 +4,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.exceptions import NotFound, PermissionDenied, ParseError
+from rest_framework import status, serializers
+from rest_framework.exceptions import NotFound, PermissionDenied, ParseError, ValidationError
 from rest_framework.pagination import CursorPagination
 
 from .models import Post, Comment
 from .serializers import (
-    PostSerializers,
+    PostSerializers,PostListSerializer,
     PostListSerializers, PostDetailSerializers, 
     CommentSerializers, ReplySerializers
     )
@@ -267,7 +267,8 @@ class Posts(APIView, PaginaitionHandlerMixin):#image test 해보기 - with front
         }
     )
     def post(self, request):#게시글 생성
-    #input data:{"content":"test post", "boardAnimalTypes":["강아지"], "Image":[], "categoryType":"장소후기"}   
+    #input data:{"content":"test post", "boardAnimalTypes":["강아지"], "Image":[], "categoryType":"장소후기"} 
+    #input data: {"content":"test post", "boardAnimalTypes":["새"], "Image":[{"img_path":"https://storage.enuri.info/pic_upload/knowbox/mobile_img/202201/2022010406253633544.jpg"}], "categoryType":"장소후기"}  
         serializer=PostSerializers(data=request.data)
         print("re: ", request.data)
         
@@ -313,14 +314,18 @@ class PostDetail(APIView):#게시글의 자세한 정보(+댓글 포함)
             data=request.data,
             partial=True
         )
+        print("re: ", request.data)
         if serializer.is_valid():
             try:
                 post=serializer.save(
                     category=request.data.get("categoryType"),
-                    pet_category=request.data.get("boardAnimalTypes"),
+                    boardAnimalTypes=request.data.get("boardAnimalTypes"),
+                    Image=request.data.get("Image")
                 )
-            except: 
-                post = serializer.save(category=request.data.get("categoryType"))    
+            except serializers.ValidationError as e: 
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                
+            post = serializer.save(category=request.data.get("categoryType"))    
             serializer=PostDetailSerializers(post)
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         else:
@@ -333,7 +338,6 @@ class PostDetail(APIView):#게시글의 자세한 정보(+댓글 포함)
         post.delete()
         return Response(status=status.HTTP_200_OK)
     
-
 class PostComments(APIView, PaginaitionHandlerMixin ):#게시글에 등록 되어진 댓글, 대댓글
     pagination_class=CommentPagination
     def get_object(self, pk):
@@ -360,21 +364,21 @@ class PostComments(APIView, PaginaitionHandlerMixin ):#게시글에 등록 되�
         # "parent_comment": null,
         # "post": 4,
         # "user": 4,
-        # "content": "댓글1"
+        # "content": "댓글1"(-> required filed로 변경해야)
         # }
         content=request.data.get("content")
-        post_id=request.data.get("post")
-        parent_comment_id = request.data.get("parent_comment", None)#부모댓글 정보 #부모댓글 정보가 전달 되지 않을 경우, None할당(=댓글)
+        post=self.get_object(pk=pk)
+        print("test: ", post)
+        if not content:
+            return Response({"error":"작성하실 내용을 입력해 주세요"}, status=status.HTTP_400_BAD_REQUEST) 
         
-        try:
-            post=Post.objects.get(id=post_id)
-        except Post.DoesNotExist:
-            return Response({"error":"해당 게시글이 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
-
+        parent_comment_id = request.data.get("parent_comment", None)#부모댓글 정보 #부모댓글 정보가 전달 되지 않을 경우, None할당(=댓글)
+        print("parent_comment_id: ",parent_comment_id)
+       
         if parent_comment_id is not None:#대댓글
             try:
                 parent_comment = Comment.objects.get(id=parent_comment_id)
-                print(parent_comment)
+                print("parent_comment",parent_comment)
             except Comment.DoesNotExist:
                 return Response({"error":"해당 댓글이 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
         
@@ -388,7 +392,9 @@ class PostComments(APIView, PaginaitionHandlerMixin ):#게시글에 등록 되�
             return Response(serializer.data, status=status.HTTP_201_CREATED)           
         else: #댓글
             print("댓글")
-            serializer=CommentSerializers(data=request.data)
+            serializer=CommentSerializers(
+                data=request.data
+            )
             if serializer.is_valid():
                 comment=serializer.save(post=post)
                 serializer=CommentSerializers(comment)

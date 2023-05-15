@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-from users.serializers import TinyUserSerializers
+from users.serializers import TinyUserSerializers, SimpleUserSerializer
 from .models import Post,Comment
 from images.models import Image
 from images.serializers import ImageSerializers
@@ -25,6 +25,7 @@ sys.setrecursionlimit(100000)
 
 
 class CommentSerializers(ModelSerializer):
+    # user=SimpleUserSerializer(read_only=True)
     class Meta:
         model=Comment
         fields=( 
@@ -36,9 +37,12 @@ class CommentSerializers(ModelSerializer):
             "createdDate",
             "updatedDate"
         ) 
-
+    # def validate(self, attrs):
+        #예외: content field가 None 이면, 에러 발생
+        # return super().validate(attrs)
 class ReplySerializers(ModelSerializer):
     children=serializers.SerializerMethodField()
+    user=SimpleUserSerializer(read_only=True)
     
     class Meta:
         model=Comment
@@ -155,7 +159,7 @@ class PostSerializers(ModelSerializer):#댓글 없음.
         return data
 
 class PostListSerializers(ModelSerializer):#간략한 정보만을 보여줌
-    user=TinyUserSerializers(read_only=True)
+    user=SimpleUserSerializer(read_only=True)
     boardAnimalTypes=PetsSerializers(many=True)
     categoryType=BoardSerializers()
     Image=ImageSerializers(many=True, read_only=True, required=False)
@@ -185,7 +189,7 @@ class PostListSerializers(ModelSerializer):#간략한 정보만을 보여줌
         return obj.commentCount
     
 class PostListSerializer(ModelSerializer):#MY/Post에서 이용
-    # user=TinyUserSerializers(read_only=True)
+    user=TinyUserSerializers(read_only=True)
     boardAnimalTypes=PetsSerializers(many=True)
     categoryType=BoardSerializers()
     Image=ImageSerializers(many=True, read_only=True, required=False)
@@ -214,7 +218,7 @@ class PostListSerializer(ModelSerializer):#MY/Post에서 이용
     def get_commentCount(self, obj):
         return obj.commentCount     
 class PostDetailSerializers(ModelSerializer):#image 나열
-    user=TinyUserSerializers()
+    user=SimpleUserSerializer()
     boardAnimalTypes=PetsSerializers(many=True)
     categoryType=BoardSerializers()
     Image=ImageSerializers(many=True, read_only=True, required=False)
@@ -256,20 +260,38 @@ class PostDetailSerializers(ModelSerializer):#image 나열
             return Bookmark.objects.filter(user=request.user, post=data).exists()
         return False
     
-    #{ update()-put()
-    #"content": "test",
-    #"categoryType": {"categoryType": "반려고수"},
-    #"boardAnimalTypes": [{"animalTypes": "강아지"}, {"animalTypes":"햄스터"}, {"animalTypes":"기타"}]
-    #}
-    # image : 다중 이미지 만들기. 
+# {
+    # "content": "test",
+    # "categoryType": {"categoryType": "반려고수"},
+    # "Image": [
+    # {
+    #        "img_path": "https://res.cloudinary.com/dk-find-out/image/upload/q_80,w_960,f_auto/DCTM_Penguin_UK_DK_AL526630_wkmzns.jpg"
+    # }
+    # ],
+    # "boardAnimalTypes": [{"animalTypes": "새"}]
+# }
+    
     def update(self, instance, validated_data):
         
         instance.boardAnimalTypes.clear()
         pet_category_data = validated_data.pop("boardAnimalTypes", None)
         category_data = validated_data.pop("categoryType", None)
+        image_data = validated_data.pop("Image", None)
+        existing_image_count = instance.Image.count()
         
-        # image_data = validated_data.pop("Image", None)
-  
+        if image_data:
+            if isinstance(image_data, list):
+                total_image_count = existing_image_count + len(image_data)
+                if total_image_count > 5:
+                    raise serializers.ValidationError("이미지는 최대 5장 까지 업로드 할 수 있습니다.")
+                
+                instance.Image.clear()
+                
+                for img in image_data:
+                    Image.objects.create(post=instance, img_path=img.get("img_path"))
+            else:
+                raise serializers.ValidationError("image 잘못된 형식 입니다.")
+                   
         if category_data:
             category_instance = Category.objects.filter(categoryType=category_data.get("categoryType")).first()
             if not category_instance:
@@ -280,16 +302,15 @@ class PostDetailSerializers(ModelSerializer):#image 나열
         instance = super().update(instance, validated_data)
 
         # Update the many-to-many fields
+        
         if pet_category_data is not None:
             for pet_category in pet_category_data:
+                print("aa: ", pet_category)
                 animalTypes = pet_category.get("animalTypes")
+                print("9:", animalTypes)
                 if animalTypes:
                     pet_category, _ = Pet.objects.get_or_create(animalTypes=animalTypes)
                     instance.boardAnimalTypes.add(pet_category)
-        
-        # if image_data is not None:
-        #     for i, image in enumerate(image_data):
-        #         Image.objects.update_or_create(id=image.get("id"), defaults={"image": image.get("image"), "order": i, "post": instance})            
         
         instance.save()
         return instance

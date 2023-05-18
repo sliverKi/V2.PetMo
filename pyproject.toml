@@ -22,6 +22,7 @@ django-elasticsearch-dsl-drf = "^0.22.5"
 django-seed = "^0.3.1"
 faker = "^18.9.0"
 djangorestframework-simplejwt = "^5.2.2"
+psycopg2-binary = "^2.9.6"
 
 
 [build-system]

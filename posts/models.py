@@ -20,7 +20,8 @@ class Post(CommonModel):
     )
     boardAnimalTypes=models.ManyToManyField(
         "pets.Pet",
-        related_name="posts"
+        related_name="posts",
+        null=True,
     )
     categoryType=models.ForeignKey(
         "categories.Category",

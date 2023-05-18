@@ -37,14 +37,17 @@ CORS_ALLOW_ALL_ORIGINS = True
 DEBUG = True
 
 THIRD_PARTY_APPS=[
-    "rest_framework",
-    # "rest_framework.authtoken",
-    "rest_framework_simplejwt",
     # "rest_framework_simplejwt.token_blacklist",
     # "dj_rest_auth",
     # "dj_rest_auth.registration",
-    "corsheaders",
-    "drf_yasg",
+    'rest_framework',
+    # "rest_framework.authtoken",
+    'rest_framework_simplejwt',
+    'corsheaders',
+    'drf_yasg',
+    'django_seed',
+    'django_elasticsearch_dsl',
+    'django_elasticsearch_dsl_drf',
 
 ]
 CUSTOM_APPS=[
@@ -133,9 +136,11 @@ REST_FRAMEWORK={
         'PAGE_SIZE': 10,
 }
 
-
-
-
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'elasticsearch:9200'
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -157,23 +162,23 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 #Log
-LOGGING={
-    "version":1,
-    "disable_existing_loggers":False,
-    "formatters":{
-        "verbose":{
-            "format": "%(levelname)s %(name)-12s %(asctime)s %(module)s" "%(process)d %(thread)d %(message)s"
-        }
-    },
-    "handlers":{
-        "console":{
-            "level":"DEBUG",
-            "class":"logging.StreamHandler",
-            "formatter":"verbose"
-        }
-    },
-    "root":{"level":"INFO", "handlers":{"console"}},
-}
+# LOGGING={
+#     "version":1,
+#     "disable_existing_loggers":False,
+#     "formatters":{ #로그 포맷터
+#         "verbose":{
+#             "format": "%(levelname)s %(name)-12s %(asctime)s %(module)s" "%(process)d %(thread)d %(message)s"
+#         }
+#     },
+#     "handlers":{#log record로 어떤 작업을 할 지  
+#         "console":{
+#             "level":"DEBUG",
+#             "class":"logging.StreamHandler",
+#             "formatter":"verbose"
+#         }
+#     },
+#     "root":{"level":"INFO", "handlers":{"console"}},
+# }
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -184,7 +189,6 @@ TIME_ZONE = 'Asia/Seoul'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/

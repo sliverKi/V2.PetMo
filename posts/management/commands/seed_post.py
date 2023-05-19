@@ -35,14 +35,8 @@ class Command(BaseCommand):
             post=Post.objects.create(
                 user=user,
                 content=fake.text(max_nb_chars=255),
-                categoryType= lambda x: Category.objects.first()
+                categoryType= Category.objects.order_by("?").first()
             )
-            # print("Category.objects.all: ", Category.objects.all())
-
-            # post_category = random.sample(list(Category.objects.all(), random.randint(1)))
-            # post.append(post_category)
-
-            # print("post_category: ", post_category)
 
             pet_objects = random.sample(list(Pet.objects.all()), random.randint(1, 3))
             print("pet_objects: ", pet_objects)

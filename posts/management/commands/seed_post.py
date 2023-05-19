@@ -42,7 +42,6 @@ class Command(BaseCommand):
             print("pet_objects: ", pet_objects)
             post.boardAnimalTypes.set(pet_objects) 
             print("add success")
-          
-        self.stdout.write(self.style.SUCCESS("게시글을 성공적으로 생성했습니다."))
 
-#수정사항: category 랜덤으로 받을 것.
+        
+        self.stdout.write(self.style.SUCCESS(f"총 {len(users)*count}의 게시글을 성공적으로 생성했습니다."))

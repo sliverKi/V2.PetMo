@@ -24,17 +24,19 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        fake=Faker(['ko_KR'])
+        fake=Faker('ko_KR')
         count=options["count"]
 
         # make post
+        # fake=Faker('ko_KR')가 text, word에는 한국어 미적용된다고 함..
+        #  그렇다면 검색엔진을 한국어로 설정할 필요가 있나?(<- 보류:한국어 설정 )
         users = User.objects.all()
         print("users: ", users)
-        for user in users:
-            print
+        # for user in users:
+        for _ in range(count):
             post=Post.objects.create(
-                user=user,
-                content=fake.text(max_nb_chars=255),
+                user=User.objects.order_by("?").first(),
+                content=fake.text(max_nb_chars=550),
                 categoryType= Category.objects.order_by("?").first()
             )
 
@@ -44,4 +46,4 @@ class Command(BaseCommand):
             print("add success")
 
         
-        self.stdout.write(self.style.SUCCESS(f"총 {len(users)*count}의 게시글을 성공적으로 생성했습니다."))
+        self.stdout.write(self.style.SUCCESS(f"총 {count}개의 게시글을 성공적으로 생성했습니다."))

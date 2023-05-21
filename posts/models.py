@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Count
+
 from common.models import CommonModel
 
 
@@ -14,7 +14,7 @@ class Post(CommonModel):
         related_name="posts"
     )
     content=models.TextField(
-        max_length=255,
+        max_length=550,
         blank=True,
         null=True,
     )

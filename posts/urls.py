@@ -10,6 +10,9 @@ urlpatterns=[
         
     path("comments/", views.Comments.as_view()), #[GET, POST, pagination]
     path("comments/<int:pk>", views.CommentDetail.as_view()),#[GET,PUT(댓글만 수정 가능),DELETE]
+
+    # path('elastic/', views.PublishDocumentView.as_view({'get':'list'}), name='post_search'),
+
 ]
 # pagination 적용 OK
 # 게시글 : 10개 pagination, 댓글: 5개 pagination

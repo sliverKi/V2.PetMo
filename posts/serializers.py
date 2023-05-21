@@ -23,6 +23,8 @@ import sys
 from django.db import transaction
 sys.setrecursionlimit(100000)
 
+from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
+
 
 class CommentSerializers(ModelSerializer):
     user=SimpleUserSerializer(read_only=True)
@@ -312,3 +314,14 @@ class PostDetailSerializers(ModelSerializer):#image 나열
         instance.save()
         return instance
   
+
+# class PostDocumentSerializer(DocumentSerializer):
+    # def get_location(self, obj):
+    #     try:
+    #         return obj.location.to_dict()
+    #     except:
+    #         return {}
+    # class Meta:
+    #     model=Post
+    #     # document=PostDocument
+    #     fields=('content')

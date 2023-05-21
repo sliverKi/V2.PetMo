@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand, CommandParser
 
 from faker import Faker
 from django_seed import Seed
-from users.models import User
+from users.models import User, Address
 from posts.models import Post
 from images.models import Image
 from pets.models import Pet
@@ -34,7 +34,7 @@ class Command(BaseCommand):
             "profile": lambda x: fake.url(),
             "address": None,
             "hasPet": lambda x : random.choice([True, False]),
-            "first": False,
+            "first": True,
             "is_staff": False,
             "is_active": True,
             "dated_joined": fake.date_time_this_decade(),
@@ -46,7 +46,10 @@ class Command(BaseCommand):
         user_ids = [pk for model, pks in user_inserted_pks.items() if model == User for pk in pks]
         print("user_ids: ", user_ids)
 
+        # print("a: ",fake.address())
         
+        
+
         for user_id in user_ids:
             user = User.objects.get(id=user_id)
             print("user: ", user)
@@ -54,7 +57,18 @@ class Command(BaseCommand):
                 num_pets = random.randint(1,3)
                 pets = random.sample(list(Pet.objects.all()), num_pets)
                 user.pets.set(pets)
+            fake_address=fake.address()
+            reegions=fake_address.split()
+            print(reegions[0], reegions[1], reegions[2])
+            address = Address.objects.create(
+                user=user,
+                addressName=fake_address,
+                regionDepth1=reegions[0],
+                regionDepth2=reegions[1],
+                regionDepth3=reegions[2],
+            )        
 
-        user.save()
-        self.stdout.write(self.style.SUCCESS(f"Successful generated {count} users."))
+            user.address = address
+            user.save()
+        self.stdout.write(self.style.SUCCESS(f"총 {count}명의 사용자를 성공적으로 생성하였습니다."))
             

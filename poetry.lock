@@ -536,14 +536,14 @@ validation = ["swagger-spec-validator (>=2.1.0)"]
 
 [[package]]
 name = "elasticsearch"
-version = "7.17.9"
+version = "7.14.0"
 description = "Python client for Elasticsearch"
 category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4"
 files = [
-    {file = "elasticsearch-7.17.9-py2.py3-none-any.whl", hash = "sha256:0e2454645dc00517dee4c6de3863411a9c5f1955d013c5fefa29123dadc92f98"},
-    {file = "elasticsearch-7.17.9.tar.gz", hash = "sha256:66c4ece2adfe7cc120e2b6a6798a1fd5c777aecf82eec39bb95cef7cfc7ea2b3"},
+    {file = "elasticsearch-7.14.0-py2.py3-none-any.whl", hash = "sha256:084979d21cc2955903ecc215bb40b8180207b2bcb5e52ec0ec7dd6f60affd01e"},
+    {file = "elasticsearch-7.14.0.tar.gz", hash = "sha256:f3ab1454e646170bbc6796b8707e4bff125234391d2acc022221e1c0313becb4"},
 ]
 
 [package.dependencies]
@@ -1156,4 +1156,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "1d545e43e068be9f796d110f17131250b891f935077d8d610beb1e3cd1e0f74b"
+content-hash = "b7b81fa91a51447b83f919abd4ee23f6f24db52771bc6702626fbcb92946e345"

@@ -138,8 +138,8 @@ REST_FRAMEWORK={
 
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'elasticsearch:9200'
-    },
+        "hosts": "localhost:9200"
+    }
 }
 
 # Password validation

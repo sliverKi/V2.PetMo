@@ -60,6 +60,7 @@ CUSTOM_APPS=[
     "auths.apps.AuthsConfig",
     "bookmarks.apps.BookmarksConfig",
     "likes.apps.LikesConfig",
+    "search.apps.SearchConfig"
 ]
 
 SYSTEM_APPS = [

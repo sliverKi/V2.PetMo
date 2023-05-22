@@ -17,7 +17,7 @@ from pets.models import Pet
 from pets.serializers import PetsSerializers
 from likes.models import PostLike
 from bookmarks.models import Bookmark
-
+from search.documents import PostDocument
 import sys
 
 from django.db import transaction
@@ -315,13 +315,26 @@ class PostDetailSerializers(ModelSerializer):#image 나열
         return instance
   
 
-# class PostDocumentSerializer(DocumentSerializer):
-    # def get_location(self, obj):
-    #     try:
-    #         return obj.location.to_dict()
-    #     except:
-    #         return {}
-    # class Meta:
-    #     model=Post
-    #     # document=PostDocument
-    #     fields=('content')
+class PostSearchSerializer(DocumentSerializer):
+    user=SimpleUserSerializer(read_only=True)
+    boardAnimalTypes=PetsSerializers(many=True)
+    categoryType=BoardSerializers()
+    Image=ImageSerializers(many=True, read_only=True, required=False)
+
+    class Meta:
+        model=Post
+        document=PostDocument
+        fields=(
+            "id",
+            "categoryType",
+            "boardAnimalTypes",
+            "user",
+            "content",
+            "Image",
+            "createdDate", 
+            "updatedDate",
+            "viewCount",
+            "likeCount",
+            "commentCount",
+            "bookmarkCount",
+        )

@@ -935,6 +935,17 @@ files = [
 six = ">=1.5"
 
 [[package]]
+name = "python-logstash"
+version = "0.4.8"
+description = "Python logging handler for Logstash."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "python-logstash-0.4.8.tar.gz", hash = "sha256:d04e1ce11ecc107e4a4f3b807fc57d96811e964a554081b3bbb44732f74ef5f9"},
+]
+
+[[package]]
 name = "python3-openid"
 version = "3.2.0"
 description = "OpenID support for modern servers and consumers."
@@ -1156,4 +1167,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "b7b81fa91a51447b83f919abd4ee23f6f24db52771bc6702626fbcb92946e345"
+content-hash = "b7d18d15840c23aa2cfb35a51b1472bf03840db3822bfb748cbf691b37f44fd1"

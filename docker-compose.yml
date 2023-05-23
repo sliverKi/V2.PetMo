@@ -18,8 +18,9 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
     container_name: elasticsearch
+    restart: always
     volumes:
-      - ./data/elastic:/var/lib/elasticsearch/data
+      - ./data/elastic:/usr/share/elasticsearch/data
     environment:
       - discovery.type=single-node
     ports:
@@ -27,9 +28,34 @@ services:
     networks:
       - elastic
 
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.14.0
+    container_name: logstash
+    volumes:
+      - ./logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    command: logstash -f /usr/share/logstash/pipeline/logstash.conf
+    depends_on:
+      - elasticsearch
+    networks:
+      - elastic    
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.14.0
+    container_name: kibana
+    restart: always
+    ports:
+      - 5601:5601
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - elastic
+
 networks:
   elastic:
-    driver: bridge 
+    driver: bridge
+
       
 
 

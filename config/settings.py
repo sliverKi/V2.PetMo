@@ -163,23 +163,43 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 #Log
-# LOGGING={
-#     "version":1,
-#     "disable_existing_loggers":False,
-#     "formatters":{ #로그 포맷터
-#         "verbose":{
-#             "format": "%(levelname)s %(name)-12s %(asctime)s %(module)s" "%(process)d %(thread)d %(message)s"
-#         }
-#     },
-#     "handlers":{#log record로 어떤 작업을 할 지  
-#         "console":{
-#             "level":"DEBUG",
-#             "class":"logging.StreamHandler",
-#             "formatter":"verbose"
-#         }
-#     },
-#     "root":{"level":"INFO", "handlers":{"console"}},
-# }
+LOGGING={
+    "version":1,
+    "disable_existing_loggers":False,
+    "formatters":{ #로그 포맷터
+        "verbose":{
+            "format": "%(levelname)s %(name)-12s %(asctime)s %(module)s" "%(process)d %(thread)d %(message)s"
+        }
+    },
+    'handlers': {                       
+        'logstash': {
+            'level': 'INFO',
+            'class': 'logstash.TCPLogstashHandler',
+            'host': 'localhost',
+            'port': 5959,  # Default value: 5959
+            'version': 1,
+            'message_type': 'django',
+            'fqdn': False,
+            'tags': ['django.request'],
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {                        
+        'django.request': {
+            'handlers': ['logstash'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['console'],
+            'propagate': True,
+        },
+    }
+}
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 

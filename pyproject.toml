@@ -24,6 +24,7 @@ faker = "^18.9.0"
 djangorestframework-simplejwt = "^5.2.2"
 psycopg2-binary = "^2.9.6"
 elasticsearch = "7.14.0"
+python-logstash = "^0.4.8"
 
 
 [build-system]

@@ -2,10 +2,14 @@ version: '3'
 
 services:
   web:
+    image: elk:7.14.0
     build: .
     command: python manage.py runserver 0.0.0.0:8000
+    # volumes:
+    #   - .:/code
     volumes:
-      - .:/code
+      - logs_volume:/src/logs
+      - static_volume:/src/staticfiles
     ports:
       - "8000:8000"
     env_file:
@@ -29,10 +33,15 @@ services:
       - elastic
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:7.14.0
+    image: logstash:7.14.0
     container_name: logstash
+    build:
+      context: .docker/logstash
+      dockerfile: Dockerfile
     volumes:
-      - ./logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - logs_volume:/logs:ro
+    # volumes:
+    #   - ./logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
     command: logstash -f /usr/share/logstash/pipeline/logstash.conf
     depends_on:
       - elasticsearch
@@ -40,8 +49,11 @@ services:
       - elastic    
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.14.0
+    image: kibana:7.14.0
     container_name: kibana
+    build:
+      context: .docker/kibana
+      dockerfile: Dockerfile
     restart: always
     ports:
       - 5601:5601
@@ -49,8 +61,28 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     depends_on:
       - elasticsearch
+      - logstash
     networks:
       - elastic
+
+  filebeat:
+    image: filebeat:7.14.0
+    container_name: filebeat
+    build: 
+      context: .docker/filebeat
+      dockerfile: Dockerfile
+    volumes:
+      - logs_volume:/app/logs
+    command: filebeat -c /usr/share/filebeat/filebeat.yml -e
+    depends_on:
+      - elasticsearch
+    networks:
+      - elastic
+
+volumes:
+  static_volume:
+  elasticsearch_volume:
+  logs_volume:
 
 networks:
   elastic:

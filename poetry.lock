@@ -646,6 +646,17 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "json-log-formatter"
+version = "0.5.2"
+description = "JSON log formatter"
+category = "main"
+optional = false
+python-versions = ">=2.7"
+files = [
+    {file = "JSON-log-formatter-0.5.2.tar.gz", hash = "sha256:7b191ae4056468baf2b7445c5ce651bd9ee6b76b4162a479a7d85db6ae029f2d"},
+]
+
+[[package]]
 name = "markupsafe"
 version = "2.1.2"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -1167,4 +1178,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "b7d18d15840c23aa2cfb35a51b1472bf03840db3822bfb748cbf691b37f44fd1"
+content-hash = "fd4b6eb165f3f1f312455efbb14959f73796642f2fa11b07400aa2958157956e"

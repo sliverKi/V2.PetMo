@@ -3,7 +3,7 @@ from pathlib import Path
 from datetime import timedelta
 import os
 import environ
-
+from .logger import CustomisedJSONFormatter
 
 env = environ.Env()
 
@@ -161,43 +161,38 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+APP_ID = 'petmo_elk'
 #Log
 LOGGING={
     "version":1,
-    "disable_existing_loggers":False,
-    "formatters":{ #로그 포맷터
-        "verbose":{
-            "format": "%(levelname)s %(name)-12s %(asctime)s %(module)s" "%(process)d %(thread)d %(message)s"
-        }
+        'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[%(asctime)s] %(levelname)s|%(name)s|%(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+        "json": {
+            '()': CustomisedJSONFormatter,
+        },
     },
-    'handlers': {                       
-        'logstash': {
-            'level': 'INFO',
-            'class': 'logstash.TCPLogstashHandler',
-            'host': 'localhost',
-            'port': 5959,  # Default value: 5959
-            'version': 1,
-            'message_type': 'django',
-            'fqdn': False,
-            'tags': ['django.request'],
+    'handlers': {
+        'app_log_file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': Path(BASE_DIR).resolve().joinpath('logs', 'app.log'),
+            'maxBytes': 1024 * 1024 * 15,  # 15MB
+            'backupCount': 10,
+            'formatter': 'json',
         },
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
-        },
+            'formatter': 'simple'
+        }
     },
-    'loggers': {                        
-        'django.request': {
-            'handlers': ['logstash'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'django': {
-            'handlers': ['console'],
-            'propagate': True,
-        },
+    'root': {
+        'handlers': ['console', 'app_log_file'],
+        'level': 'DEBUG',
     }
 }
 # Internationalization

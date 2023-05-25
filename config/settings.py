@@ -19,14 +19,16 @@ ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ORIGIN_ALLOW = True
+CORS_ALLOW_ALL_ORIGINS=True
 
-CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:3000", 'http://localhost:3000']
-
-CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:3000","http://localhost:3000","http://127.0.0.1:8000","http://localhost:8000" ]
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000" ]
 
 # CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:3000','http://localhost:3000']
 
-CORS_ALLOW_ALL_ORIGINS = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -34,7 +36,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 THIRD_PARTY_APPS=[
     # "rest_framework_simplejwt.token_blacklist",
@@ -164,7 +166,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 APP_ID = 'petmo_elk'
-#Log
+#ELK-Logstash
 # LOGGING={
 #     "version":1,
 #         'disable_existing_loggers': False,
@@ -181,7 +183,7 @@ APP_ID = 'petmo_elk'
 #         'app_log_file': {
 #             'level': 'DEBUG',
 #             'class': 'logging.handlers.RotatingFileHandler',
-#             'filename': Path(BASE_DIR).resolve().joinpath('logs', 'app.log'),
+#             'filename': Path(BASE_DIR).resolve().joinpath('app/logs', 'app.log'),
 #             'maxBytes': 1024 * 1024 * 15,  # 15MB
 #             'backupCount': 10,
 #             'formatter': 'json',
@@ -211,11 +213,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+#by gunicorn
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'app', 'static')
 
+#debug-toolbar
 INTERNAL_IPS=[
     '127.0.0.1',
 ]
+
 MEDIA_ROOT = "uploads"
 
 MEDIA_URL = "user-uploads/"
@@ -225,8 +231,10 @@ MEDIA_URL = "user-uploads/"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "users.User"
 
+#External API KEY
 GOOGLE_MAPS_API_KEY = env("GOOGLE_MAPS_API_KEY")
 KAKAO_API_KEY=env("KAKAO_API_KEY")
 
+#Cloudflare
 CF_TOKEN=env("CF_TOKEN")
 CF_ID=env("CF_ID")

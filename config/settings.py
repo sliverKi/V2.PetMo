@@ -48,6 +48,7 @@ THIRD_PARTY_APPS=[
     'django_seed',
     'django_elasticsearch_dsl',
     'django_elasticsearch_dsl_drf',
+    'debug_toolbar',
 
 ]
 CUSTOM_APPS=[
@@ -90,6 +91,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -163,38 +165,38 @@ AUTH_PASSWORD_VALIDATORS = [
 
 APP_ID = 'petmo_elk'
 #Log
-LOGGING={
-    "version":1,
-        'disable_existing_loggers': False,
-    'formatters': {
-        'simple': {
-            'format': '[%(asctime)s] %(levelname)s|%(name)s|%(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S',
-        },
-        "json": {
-            '()': CustomisedJSONFormatter,
-        },
-    },
-    'handlers': {
-        'app_log_file': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': Path(BASE_DIR).resolve().joinpath('logs', 'app.log'),
-            'maxBytes': 1024 * 1024 * 15,  # 15MB
-            'backupCount': 10,
-            'formatter': 'json',
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        }
-    },
-    'root': {
-        'handlers': ['console', 'app_log_file'],
-        'level': 'DEBUG',
-    }
-}
+# LOGGING={
+#     "version":1,
+#         'disable_existing_loggers': False,
+#     'formatters': {
+#         'simple': {
+#             'format': '[%(asctime)s] %(levelname)s|%(name)s|%(message)s',
+#             'datefmt': '%Y-%m-%d %H:%M:%S',
+#         },
+#         "json": {
+#             '()': CustomisedJSONFormatter,
+#         },
+#     },
+#     'handlers': {
+#         'app_log_file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.handlers.RotatingFileHandler',
+#             'filename': Path(BASE_DIR).resolve().joinpath('logs', 'app.log'),
+#             'maxBytes': 1024 * 1024 * 15,  # 15MB
+#             'backupCount': 10,
+#             'formatter': 'json',
+#         },
+#         'console': {
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'simple'
+#         }
+#     },
+#     'root': {
+#         'handlers': ['console', 'app_log_file'],
+#         'level': 'DEBUG',
+#     }
+# }
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -211,6 +213,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+INTERNAL_IPS=[
+    '127.0.0.1',
+]
 MEDIA_ROOT = "uploads"
 
 MEDIA_URL = "user-uploads/"

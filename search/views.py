@@ -10,7 +10,7 @@ from elasticsearch_dsl import Q
 class SearchPost(APIView, PageNumberPagination):
     post_serializer=PostSearchSerializer
     search_document=PostDocument
-    
+   
     def get(self, request, query=None):
         try:
             print(query)

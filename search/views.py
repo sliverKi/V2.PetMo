@@ -30,5 +30,5 @@ class SearchPost(APIView, PageNumberPagination):
             return self.get_paginated_response(serializer.data)
 
         except Exception as e:
-            return HttpResponse(e, status=500)
+            return HttpResponse(str(e), status=500)
         

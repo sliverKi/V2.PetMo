@@ -2,18 +2,17 @@ version: '3'
 
 services:
   
-  django:
+  web:
     image: elk:7.14.0
-    container_name: django
+    container_name: web
     build: .
     # command: python manage.py runserver 0.0.0.0:8000
     command:  gunicorn --bind 0.0.0.0:8000 config.wsgi:application 
     restart: always
-    # volumes:
-    #   - .:/code
     volumes:
-      - logs_volume:/app/logs
-      - static_volume:/app/static
+      - .:/code
+      - logs_volume:/code/app/logs
+      - static_volume:/code/app/static
     ports:
       - "8000:8000"
     env_file:
@@ -31,35 +30,36 @@ services:
       context: .docker/nginx
       dockerfile: Dockerfile
     volumes:
-      - static_volume:/app/static
+      - .docker/nginx/conf.d/:/etc/nginx/conf.d
+      - static_volume:/home/app/static
     ports:
       - 80:80
     depends_on:
-      - django 
+      - web 
     networks:
       - elastic  
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
-    container_name: elasticsearch
-    restart: always
-    volumes:
-      - elasticsearch_volume:/usr/share/elasticsearch/data
-    environment:
-      - discovery.type=single-node
-    ports:
-      - 9200:9200
-    networks:
-      - elastic
-
+  
 volumes:
   static_volume:
-  elasticsearch_volume:
-  logs_volume:
+  # elasticsearch_volume:
+  # logs_volume:
 
 networks:
   elastic:
-    driver: bridge
+    driver: bridge    
+
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
+  #   container_name: elasticsearch
+  #   restart: always
+  #   volumes:
+  #     - elasticsearch_volume:/usr/share/elasticsearch/data
+  #   environment:
+  #     - discovery.type=single-node
+  #   ports:
+  #     - 9200:9200
+  #   networks:
+  #     - elastic
 
   # kibana:
   #   image: kibana:7.14.0
@@ -85,10 +85,10 @@ networks:
   #     context: .docker/filebeat
   #     dockerfile: Dockerfile
   #   volumes:
-  #     - logs_volume:/app/logs
+  #     - logs_volume:/code/app/logs
   #   command: filebeat -c /usr/share/filebeat/filebeat.yml -e -d "*" -strict.perms=false
   #   depends_on:
-  #     - django
+  #     - web
     # networks:
     #   - elastic
 
@@ -100,7 +100,7 @@ networks:
   #     context: .docker/logstash
   #     dockerfile: Dockerfile
   #   volumes:
-  #     - logs_volume:/logs:ro
+  #     - logs_volume:/code/app/logs:ro
   #   # volumes:
   #   #   - ./logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
   #   command: logstash -f /usr/share/logstash/pipeline/logstash.conf
@@ -110,5 +110,4 @@ networks:
     #   - elastic    
 
       
-
 

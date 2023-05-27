@@ -18,15 +18,15 @@ from .pagination import PaginaitionHandlerMixin
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-#elasticsearch
-import operator
-from elasticsearch_dsl import Q as QQ
-from functools import reduce
-from django_elasticsearch_dsl.search import Search
-from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
+# #elasticsearch
+# import operator
+# from elasticsearch_dsl import Q as QQ
+# from functools import reduce
+# from django_elasticsearch_dsl.search import Search
+# from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 
-from django_elasticsearch_dsl_drf.filter_backends import (
-    FilteringFilterBackend, CompoundSearchFilterBackend)
+# from django_elasticsearch_dsl_drf.filter_backends import (
+#     FilteringFilterBackend, CompoundSearchFilterBackend)
 
 class CommentPagination(CursorPagination):
     page_size=5

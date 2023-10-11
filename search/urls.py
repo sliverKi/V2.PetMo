@@ -1,6 +1,6 @@
-# from django.urls import path
-# from . import views
+from django.urls import path
+from . import views
 
-# urlpatterns=[
-#     path("<str:query>", views.SearchPost.as_view())    
-# ]
+urlpatterns=[
+    path("<str:query>", views.SearchPost.as_view())    
+]

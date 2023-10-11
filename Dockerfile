@@ -1,5 +1,5 @@
 # Base Image
-FROM python:3.11-slim-buster
+FROM python:3.9-slim-buster
 
 # Set Environment Variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -25,7 +25,7 @@ COPY poetry.lock pyproject.toml ./
 
 # Set Python Version for Poetry
 # RUN poetry env use 3.11
-
+RUN pip wheel --no-use-pep517 coreschema==0.0.4 && pip install coreschema-0.0.4-*.whl
 # Install Dependencies
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi --no-root
@@ -34,6 +34,6 @@ RUN poetry config virtualenvs.create false \
 COPY . .
 EXPOSE 8000
 # Set Startup Command
-# CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application"]
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application"]

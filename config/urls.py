@@ -27,7 +27,7 @@ urlpatterns = [
     path("api/v2/auths/", include("auths.urls")),
     path("api/v2/bookmarks/", include("bookmarks.urls")),
     path("api/v2/likes/", include("likes.urls")),
-    # path("api/v2/search/", include("search.urls")),
+    path("api/v2/search/", include("search.urls")),
 
     path(
         "swagger/", 
@@ -39,7 +39,7 @@ urlpatterns = [
         schema_view.with_ui("redoc", cache_timeout=0),
         name="schema-redoc",
         ),
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
     import debug_toolbar

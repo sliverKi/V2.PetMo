@@ -29,14 +29,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 # CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:3000','http://localhost:3000']
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 THIRD_PARTY_APPS=[
     # "rest_framework_simplejwt.token_blacklist",
@@ -63,7 +56,7 @@ CUSTOM_APPS=[
     "auths.apps.AuthsConfig",
     "bookmarks.apps.BookmarksConfig",
     "likes.apps.LikesConfig",
-    # "search.apps.SearchConfig"
+    "search.apps.SearchConfig"
 ]
 
 SYSTEM_APPS = [
@@ -94,6 +87,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware"
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -143,7 +137,7 @@ REST_FRAMEWORK={
 
 ELASTICSEARCH_DSL = {
     'default': {
-        "hosts": "localhost:9200"
+        "hosts": "elasticsearch:9200"
     }
 }
 
@@ -238,3 +232,5 @@ KAKAO_API_KEY=env("KAKAO_API_KEY")
 #Cloudflare
 CF_TOKEN=env("CF_TOKEN")
 CF_ID=env("CF_ID")
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+

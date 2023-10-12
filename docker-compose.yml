@@ -17,7 +17,6 @@ services:
       - elasticsearch
     networks:
       - elastic
-  
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
     container_name: elasticsearch
@@ -29,7 +28,6 @@ services:
       - 9200:9200
     networks:
       - elastic
-  
   nginx:
     # image: nginx:latest
     container_name: nginx
@@ -46,6 +44,38 @@ services:
       - web 
     networks:
       - elastic  
+  # logstash:
+  #   image: docker.elastic.co/logstash/logstash:7.14.0
+  #   container_name: logstash
+  #   ports:
+  #     - "5000:5000"
+  #   networks:
+  #     - elastic
+  #   depends_on:
+  #     - elasticsearch_logs
+  #   volumes:
+  #     - ./logstash/config:/config-dir
+  #   command: logstash -f /config-dir/logstash.conf
+  # elasticsearch_logs:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
+  #   container_name: elasticsearch_logs
+  #   volumes:
+  #     - ./data/elasticsearch_logs:/var/lib/elasticsearch/data
+  #   environment:
+  #     - discovery.type=single-node
+  #   ports:
+  #     - 9300:9200
+  #   networks:
+  #     - elastic
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:7.14.0
+  #   container_name: kibana
+  #   ports:
+  #     - "5601:5601"
+  #   networks:
+  #     - elastic
+  #   depends_on:
+  #     - elasticsearch_logs
 
 networks:
   elastic:
@@ -53,71 +83,8 @@ networks:
   
 volumes:
   static_volume:
-#   elasticsearch_volume:
-  # logs_volume:
 
-  
-  # web -> command:  gunicorn --bind 0.0.0.0:8000 config.wsgi:application 
-  # elasticsearch:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
-  #   container_name: elasticsearch
-  #   restart: always
-  #   volumes:
-  #     - elasticsearch_volume:/usr/share/elasticsearch/data--> Named Volume
-  #   environment:
-  #     - discovery.type=single-node
-  #   ports:
-  #     - 9200:9200
-  #   networks:
-  #     - elastic
 
-  # kibana:
-  #   image: kibana:7.14.0
-  #   container_name: kibana
-  #   build:
-  #     context: .docker/kibana
-  #     dockerfile: Dockerfile
-  #   restart: always
-  #   ports:
-  #     - 5601:5601
-  #   environment:
-  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-  #   depends_on:
-  #     - elasticsearch
-  #     - logstash
-  #   networks:
-  #     - elastic
-
-  # filebeat:
-  #   image: filebeat:7.14.0
-  #   container_name: filebeat
-  #   build: 
-  #     context: .docker/filebeat
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - logs_volume:/code/app/logs
-  #   command: filebeat -c /usr/share/filebeat/filebeat.yml -e -d "*" -strict.perms=false
-  #   depends_on:
-  #     - web
-    # networks:
-    #   - elastic
-
-  # logstash:
-  #   image: logstash:7.14.0
-  #   container_name: logstash
-  #   restart: always
-  #   build:
-  #     context: .docker/logstash
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - logs_volume:/code/app/logs:ro
-  #   # volumes:
-  #   #   - ./logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-  #   command: logstash -f /usr/share/logstash/pipeline/logstash.conf
-  #   depends_on:
-  #     - elasticsearch
-    # networks:
-    #   - elastic    
 
       
 

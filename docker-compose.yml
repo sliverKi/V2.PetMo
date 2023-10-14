@@ -17,7 +17,9 @@ services:
       - elasticsearch
     networks:
       - elastic
+
   elasticsearch:
+  
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
     container_name: elasticsearch
     volumes:
@@ -28,8 +30,9 @@ services:
       - 9200:9200
     networks:
       - elastic
+  
   nginx:
-    # image: nginx:latest
+   
     container_name: nginx
     restart: always
     build:
@@ -43,39 +46,23 @@ services:
     depends_on:
       - web 
     networks:
-      - elastic  
-  # logstash:
-  #   image: docker.elastic.co/logstash/logstash:7.14.0
-  #   container_name: logstash
-  #   ports:
-  #     - "5000:5000"
-  #   networks:
-  #     - elastic
-  #   depends_on:
-  #     - elasticsearch_logs
-  #   volumes:
-  #     - ./logstash/config:/config-dir
-  #   command: logstash -f /config-dir/logstash.conf
-  # elasticsearch_logs:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
-  #   container_name: elasticsearch_logs
-  #   volumes:
-  #     - ./data/elasticsearch_logs:/var/lib/elasticsearch/data
-  #   environment:
-  #     - discovery.type=single-node
-  #   ports:
-  #     - 9300:9200
-  #   networks:
-  #     - elastic
-  # kibana:
-  #   image: docker.elastic.co/kibana/kibana:7.14.0
-  #   container_name: kibana
-  #   ports:
-  #     - "5601:5601"
-  #   networks:
-  #     - elastic
-  #   depends_on:
-  #     - elasticsearch_logs
+      - elastic 
+
+  kibana:
+
+    image: docker.elastic.co/kibana/kibana:7.14.0
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - elastic
+    volumes:
+      - .docker/kibana/kibana.yml:/usr/share/kibana/kibana.yml
+      - kibana_data:/usr/share/kibana/data
+    depends_on:
+      - elasticsearch
 
 networks:
   elastic:
@@ -83,6 +70,7 @@ networks:
   
 volumes:
   static_volume:
+  kibana_data:
 
 
 

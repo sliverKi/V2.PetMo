@@ -13,8 +13,7 @@ https://github.com/sliverKi/V2.Myfavor-docker-backend/assets/121347506/f7d9ff3a-
 ![Frame 55](https://github.com/sliverKi/V2.PetMo/assets/121347506/7930c17b-62a8-48d6-8474-54fe71f99046)
 
 ## System - Architecture
-![image](https://github.com/sliverKi/V2.PetMo/assets/121347506/6170f9ba-3f59-4eb0-be04-f2bd7c5ae05c)
-
+![image](https://github.com/sliverKi/Algorithem/assets/121347506/77ef5bd0-f9bc-44e1-9525-346802cb6367)
 
 ## Docker
 

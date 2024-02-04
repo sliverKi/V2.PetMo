@@ -20,6 +20,9 @@ https://github.com/sliverKi/V2.Myfavor-docker-backend/assets/121347506/f7d9ff3a-
 <img width="1000" alt="docker-container 구성" src="https://github.com/sliverKi/V2.PetMo/assets/121347506/93bf4864-1ab2-4fc1-a703-0fe08cbb56f9">
 <img width="1000" src="https://github.com/sliverKi/V2.PetMo/assets/121347506/430a7f6e-54af-4435-9771-2830f22f86c0">
 
+## Push DockerImage to ECR
+![image](https://github.com/sliverKi/V2.PetMo/assets/121347506/397e3eba-885e-43d2-8bb9-f42ca7156672)
+
 ## search -API 
 Why? Using search engine by elasticsearch?
 <img width="1000" alt="create-index" src="https://github.com/sliverKi/V2.PetMo/assets/121347506/7cf098e8-5d1d-4919-b14e-4e1d8a3196cf">

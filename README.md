@@ -14,7 +14,7 @@ https://github.com/sliverKi/V2.Myfavor-docker-backend/assets/121347506/f7d9ff3a-
 
 ## System - Architecture
 ![image](https://github.com/sliverKi/Algorithem/assets/121347506/77ef5bd0-f9bc-44e1-9525-346802cb6367)
-
+![petmo-구조 v2](https://github.com/sliverKi/V2.PetMo/assets/121347506/24f6fa04-f182-4863-89fb-913fca198156)
 ## Docker
 
 <img width="1000" alt="docker-container 구성" src="https://github.com/sliverKi/V2.PetMo/assets/121347506/93bf4864-1ab2-4fc1-a703-0fe08cbb56f9">
